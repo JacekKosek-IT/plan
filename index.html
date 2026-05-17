@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>São Miguel Ultimate Mission Control v7</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto+Mono:wght@400;500;700&family=Segoe+UI:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #06090e;
+            --bg-card: #0f1622;
+            --bg-inner: #172232;
+            --accent-green: #00e676;
+            --accent-blue: #00b0ff;
+            --accent-purple: #df69ff;
+            --accent-orange: #ff7043;
+            --text-main: #ffffff;
+            --text-muted: #8da2bb;
+            --border-color: #1f2f45;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            padding-bottom: 60px;
+            line-height: 1.6;
+        }
+
+        /* EKRAN LOGOWANIA */
+        #login-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at center, #0f1622 0%, #06090e 100%);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-box {
+            background: var(--bg-card);
+            border: 2px solid var(--border-color);
+            padding: 40px;
+            border-radius: 24px;
+            text-align: center;
+            max-width: 440px;
+            width: 100%;
+            box-shadow: 0 10px 40px rgba(0, 176, 255, 0.15);
+        }
+
+        .login-box h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 24px;
+            font-weight: 900;
+            margin-bottom: 15px;
+            color: var(--accent-blue);
+            letter-spacing: 1px;
+        }
+
+        .login-box p {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+
+        .login-box input[type="password"] {
+            width: 100%;
+            padding: 14px 20px;
+            background: var(--bg-inner);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            text-align: center;
+            margin-bottom: 20px;
+            outline: none;
+            font-family: 'Roboto Mono', monospace;
+            transition: border-color 0.2s;
+        }
+
+        .login-box input[type="password"]:focus {
+            border-color: var(--accent-green);
+        }
+
+        .login-box button {
+            background: linear-gradient(45deg, var(--accent-green), var(--accent-blue));
+            border: none;
+            padding: 14px 30px;
+            color: #06090e;
+            font-size: 15px;
+            font-weight: 800;
+            border-radius: 12px;
+            cursor: pointer;
+            width: 100%;
+            transition: transform 0.15s;
+            letter-spacing: 0.5px;
+        }
+
+        .login-box button:hover {
+            transform: scale(1.02);
+        }
+
+        #error-msg {
+            color: #ff5252;
+            font-size: 13px;
+            margin-top: 15px;
+            display: none;
+            font-weight: bold;
+        }
+
+        /* GŁÓWNA ZAWARTOŚĆ STRONY */
+        #main-content {
+            display: none;
+        }
+
+        /* PASEK NAWIGACJI (TOP BAR) */
+        .nav-bar {
+            position: sticky;
+            top: 0;
+            background: rgba(15, 22, 34, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 1000;
+            padding: 12px 0;
+            overflow-x: auto;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .nav-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 15px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .nav-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 700;
+            padding: 8px 15px;
+            border-radius: 20px;
+            background: var(--bg-main);
+            border: 1px solid var(--border-color);
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--text-main);
+            border-color: var(--accent-blue);
+            background: var(--bg-inner);
+        }
+
+        .wrapper {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 20px 15px;
+        }
+
+        header {
+            text-align: center;
+            padding: 50px 20px;
+            background: linear-gradient(135deg, #0f1622 0%, #06090e 100%);
+            border-radius: 24px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+
+        header h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 34px;
+            font-weight: 900;
+            letter-spacing: -1px;
+            background: linear-gradient(45deg, var(--accent-green), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 15px;
+        }
+
+        .panel {
+            background: var(--bg-card);
+            border-radius: 24px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border-color);
+        }
+
+        .panel-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--accent-blue);
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        @media(min-width: 768px) {
+            .grid-2 { grid-template-columns: 1fr 1fr; }
+        }
+
+        /* ATRAKCJE DNIOWE */
+        .day-header {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 20px;
+            font-weight: 900;
+            margin: 45px 0 20px 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-left: 5px solid var(--accent-green);
+            padding-left: 15px;
+        }
+
+        .range-badge {
+            background: rgba(0, 230, 118, 0.12);
+            color: var(--accent-green);
+            font-size: 12px;
+            padding: 5px 14px;
+            border-radius: 30px;
+            font-weight: 700;
+            border: 1px solid rgba(0, 230, 118, 0.25);
+        }
+
+        .range-forbidden {
+            background: rgba(255, 82, 82, 0.12);
+            color: #ff5252;
+            border-color: rgba(255, 82, 82, 0.25);
+        }
+
+        .attraction-card {
+            background: var(--bg-card);
+            border-radius: 24px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 1px solid var(--border-color);
+        }
+
+        .attr-title {
+            font-size: 19px;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .attr-title::before {
+            content: "◆";
+            color: var(--accent-blue);
+            font-size: 16px;
+        }
+
+        .attr-desc {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 20px;
+            line-height: 1.7;
+        }
+
+        /* GOOGLE MAPS WRAPPERS */
+        .map-frame-wrapper {
+            position: relative;
+            padding-bottom: 45%;
+            height: 0;
+            border-radius: 14px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            margin-bottom: 15px;
+        }
+
+        .map-frame-wrapper iframe {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%; border: 0;
+        }
+
+        /* PRZYCISKI */
+        .btn-nav {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--bg-inner);
+            color: var(--accent-blue);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 13px;
+            padding: 10px 20px;
+            border-radius: 12px;
+            border: 1px solid var(--accent-blue);
+            transition: all 0.2s ease;
+        }
+
+        .btn-nav:hover {
+            background: var(--accent-blue);
+            color: var(--bg-main);
+        }
+
+        /* SŁOWNICZEK */
+        .vocab-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 15px;
+        }
+
+        .vocab-card {
+            background: var(--bg-inner);
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            border-radius: 14px;
+        }
+
+        .vocab-card .pt {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--accent-purple);
+        }
+
+        .vocab-card .pronounce {
+            font-size: 12px;
+            color: var(--accent-blue);
+            font-style: italic;
+            margin-bottom: 4px;
+        }
+
+        .vocab-card .pl {
+            font-size: 13px;
+            color: var(--text-main);
+            font-weight: 600;
+        }
+
+        .vocab-card .note {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        /* CHECKLISTA */
+        .checklist-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+        @media(min-width: 600px) {
+            .checklist-grid { grid-template-columns: 1fr 1fr; }
+        }
+
+        .check-item {
+            background: var(--bg-inner);
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            border-radius: 14px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .check-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--accent-green);
+            cursor: pointer;
+            margin-top: 2px;
+        }
+
+        .check-item-text strong {
+            display: block;
+            font-size: 14px;
+        }
+
+        .check-item-text p {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        /* WIDGET RTH */
+        .widget-box {
+            background: var(--bg-inner);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 20px;
+        }
+
+        .rth-alert {
+            background: rgba(255, 112, 67, 0.1);
+            border: 1px solid var(--accent-orange);
+            color: var(--text-main);
+        }
+
+        /* DOKUMENTY */
+        .doc-item {
+            background: var(--bg-inner);
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            border-radius: 14px;
+            margin-bottom: 12px;
+        }
+
+        .doc-item span {
+            display: block;
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .doc-item strong {
+            display: block;
+            font-size: 15px;
+            color: var(--text-main);
+            margin-top: 2px;
+        }
+
+        /* NOTATNIK */
+        .notebook {
+            width: 100%;
+            height: 150px;
+            background: var(--bg-inner);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 15px;
+            color: var(--text-main);
+            font-size: 14px;
+            resize: vertical;
+            margin-top: 10px;
+            outline: none;
+        }
+        .notebook:focus {
+            border-color: var(--accent-blue);
+        }
+
+        /* SEKCJA AI SPARKLES */
+        .ai-panel {
+            background: linear-gradient(145deg, #121e30, #0c1420);
+            border: 2px solid var(--accent-blue);
+            box-shadow: 0 0 25px rgba(0, 176, 255, 0.25);
+        }
+        .ai-title {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--accent-blue);
+            text-shadow: 0 0 8px rgba(0, 176, 255, 0.5);
+        }
+        .ai-box {
+            background: rgba(6, 9, 14, 0.6);
+            border: 1px solid rgba(0, 176, 255, 0.2);
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+        }
+        .ai-box h3 {
+            font-size: 16px;
+            color: var(--accent-green);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .ai-select, .ai-input {
+            width: 100%;
+            padding: 12px;
+            background: var(--bg-inner);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: white;
+            font-size: 14px;
+            margin-bottom: 15px;
+            outline: none;
+        }
+        .ai-select:focus, .ai-input:focus {
+            border-color: var(--accent-blue);
+        }
+        .ai-btn {
+            background: linear-gradient(45deg, var(--accent-blue), var(--accent-purple));
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(223, 105, 255, 0.3);
+        }
+        .ai-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(223, 105, 255, 0.5);
+        }
+        .ai-btn:disabled {
+            background: var(--border-color);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        .ai-response {
+            background: rgba(13, 20, 29, 0.8);
+            border-left: 4px solid var(--accent-purple);
+            padding: 15px;
+            border-radius: 0 12px 12px 0;
+            margin-top: 15px;
+            font-size: 13.5px;
+            color: var(--text-main);
+            display: none;
+            white-space: pre-line;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .spinner {
+            display: none;
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(255,255,255,0.1);
+            border-radius: 50%;
+            border-top-color: var(--accent-purple);
+            animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+<!-- EKRAN AUTORYZACJI -->
+<div id="login-screen">
+    <div class="login-box">
+        <h2>🔒 AUTORYZACJA</h2>
+        <p>Wprowadź hasło dostępu, aby odblokować panel nawigacyjny São Miguel.</p>
+        <input type="password" id="pass-input" placeholder="Wpisz hasło..." onkeydown="if(event.key === 'Enter') verifyPassword()">
+        <button onclick="verifyPassword()">ODBLOKUJ PANEL</button>
+        <div id="error-msg">❌ Błędny klucz dostępu!</div>
+    </div>
+</div>
+
+<!-- GŁÓWNA ZAWARTOŚĆ -->
+<div id="main-content">
+
+    <!-- MENU NAWIGACYJNE -->
+    <div class="nav-bar">
+        <div class="nav-container">
+            <a href="#mapa-glowna" class="nav-link">Mapa Ogólna</a>
+            <a href="#ai-hub" class="nav-link">✨ Asystent AI</a>
+            <a href="#dzien1" class="nav-link">Dzień 1</a>
+            <a href="#dzien2" class="nav-link">Dzień 2</a>
+            <a href="#dzien3" class="nav-link">Dzień 3</a>
+            <a href="#dzien4" class="nav-link">Dzień 4</a>
+            <a href="#dzien5" class="nav-link">Dzień 5</a>
+            <a href="#dzien6" class="nav-link">Dzień 6</a>
+            <a href="#slownik" class="nav-link">Słownik</a>
+            <a href="#checklist" class="nav-link">Lista Startowa</a>
+            <a href="#rth" class="nav-link">Profil RTH</a>
+            <a href="#pulpit" class="nav-link">Pulpit Pilota</a>
+        </div>
+    </div>
+
+    <div class="wrapper">
+
+        <header>
+            <h1>SÃO MIGUEL MISSION CONTROL v7</h1>
+            <p>Interaktywny Asystent Zwiedzania & Centrum Lotnicze dla Jacka</p>
+        </header>
+
+        <!-- MAPA GŁÓWNA WPISANA POPRAWNIE -->
+        <div class="panel" id="mapa-glowna">
+            <div class="panel-title" style="color: var(--accent-green);">🗺️ Centralna Interaktywna Mapa Atrakcji Wyspy</div>
+            <div class="map-frame-wrapper">
+                <iframe src="https://maps.google.com/maps?q=37.7800,-25.5000&z=10&output=embed" allowfullscreen="" loading="lazy"></iframe>
+            </div>
+        </div>
+
+        <!-- SEKCJA: ASYSTENT AI GEMINI -->
+        <div class="panel ai-panel" id="ai-hub">
+            <div class="panel-title ai-title">🤖 CENTRUM ASYSTENTA AI GEMINI</div>
+            <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 25px;">
+                Połącz się bezpośrednio z modelem Gemini, aby dynamicznie rozwiązywać wyzwania na São Miguel!
+            </p>
+
+            <!-- FUNKCJA 4: OGÓLNY CZAT & OPINIE (DODANY NA ŻYCZENIE JACKA) -->
+            <div class="ai-box">
+                <h3>💬 Ogólny Czat & Opinie o Miejscach</h3>
+                <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 12px;">
+                    Wpisz dowolne pytanie lub nazwę miejsca (np. „Czy opłaca się płynąć na Ilhéu de Vila Franca?”), a Gemini doradzi Ci, co warto tam zrobić i czy wyjazd tam się opłaca!
+                </p>
+                <input type="text" class="ai-input" id="chat-input" placeholder="Wpisz pytanie lub nazwę dowolnego miejsca na São Miguel..." />
+                <button class="ai-btn" id="btn-chat" onclick="generateGeneralChat()">
+                    <span>Zapytaj Asystenta ✨</span>
+                    <div class="spinner" id="spinner-chat"></div>
+                </button>
+                <div class="ai-response" id="response-chat"></div>
+            </div>
+
+            <!-- FUNKCJA 1: PLAN AWARYJNY -->
+            <div class="ai-box">
+                <h3>🌧️ Plan Awaryjny na Mgiełkę i Deszcz</h3>
+                <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 12px;">
+                    Chmury zasłoniły punkt widokowy? Wybierz miejsce, a Gemini zaproponuje najlepszy, natychmiastowy plan zastępczy w okolicy.
+                </p>
+                <select class="ai-select" id="weather-location">
+                    <option value="Sete Cidades / Vista do Rei">Sete Cidades & Vista do Rei</option>
+                    <option value="Lagoa do Fogo">Lagoa do Fogo</option>
+                    <option value="Furnas / Pico do Ferro">Furnas & Pico do Ferro</option>
+                    <option value="Nordeste / Ponta do Sossego">Nordeste & Ponta do Sossego</option>
+                </select>
+                <button class="ai-btn" id="btn-weather" onclick="generateWeatherAlternative()">
+                    <span>Wygeneruj Plan Awaryjny ✨</span>
+                    <div class="spinner" id="spinner-weather"></div>
+                </button>
+                <div class="ai-response" id="response-weather"></div>
+            </div>
+
+            <!-- FUNKCJA 2: KADRY DLA DRONA -->
+            <div class="ai-box">
+                <h3>🛸 Generator Kadrów Kinowych dla DJI Mini SE</h3>
+                <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 12px;">
+                    Chcesz zrobić niesamowity film? Wybierz lokację, a Gemini zaplanuje kreatywny i bezpieczny manewr lotniczy.
+                </p>
+                <select class="ai-select" id="drone-location">
+                    <option value="Vista do Rei / Sete Cidades">Vista do Rei (Sete Cidades)</option>
+                    <option value="Lagoa do Fogo (Punkt widokowy)">Lagoa do Fogo (Z góry)</option>
+                    <option value="Pico do Ferro (Furnas)">Pico do Ferro (Furnas)</option>
+                    <option value="Ponta do Sossego (Nordeste)">Ponta do Sossego (Nordeste)</option>
+                    <option value="Farol do Arnel">Latarnia Farol do Arnel (Klify)</option>
+                </select>
+                <button class="ai-btn" id="btn-drone" onclick="generateDroneShots()">
+                    <span>Zaprojektuj Lot Dronem ✨</span>
+                    <div class="spinner" id="spinner-drone"></div>
+                </button>
+                <div class="ai-response" id="response-drone"></div>
+            </div>
+
+            <!-- FUNKCJA 3: TŁUMACZ SYTUACYJNY -->
+            <div class="ai-box">
+                <h3>🗣️ Ekspresowy Tłumacz Sytuacyjny</h3>
+                <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 12px;">
+                    Wpisz po polsku, co chcesz załatwić, a Gemini da Ci idealne tłumaczenie z wymową i wskazówką savoir-vivre!
+                </p>
+                <input type="text" class="ai-input" id="translate-input" placeholder="np. Chciałbym spróbować tradycyjnego wulkanicznego Cozido..." />
+                <button class="ai-btn" id="btn-translate" onclick="generateTranslation()">
+                    <span>Przetłumacz i Podpowiedz ✨</span>
+                    <div class="spinner" id="spinner-translate"></div>
+                </button>
+                <div class="ai-response" id="response-translate"></div>
+            </div>
+        </div>
+
+        <!-- DNI ZWIEDZANIA -->
+        
+        <!-- DZIEŃ 1 -->
+        <div id="dzien1">
+            <div class="day-header">
+                <span>DZIEŃ 1: Korona Zachodu (Sete Cidades & Ferraria)</span>
+                <span class="range-badge">Można latać w zasięgu 500m</span>
+            </div>
+
+            <div class="attraction-card">
+                <div class="attr-title">Miradouro da Vista do Rei & Grota do Inferno</div>
+                <div class="attr-desc">Główna krawędź gigantycznego krateru wulkanicznego. Ścieżka na Grota do Inferno prowadzi widowiskowym, wąskim przesmykiem ziemnym z widokiem na gigantyczne jeziora kraterowe.</div>
+                <div class="map-frame-wrapper">
+                    <iframe src="https://maps.google.com/maps?q=37.8427,-25.7951&z=15&output=embed" allowfullscreen="" loading="lazy"></iframe>
+                </div>
+                <a class="btn-nav" href="https://www.google.com/maps/dir/?api=1&destination=37.8427,-25.7951" target="_blank">🧭 NAWIGUJ DO PUNKTU</a>
+            </div>
+
+            <div class="attraction-card">
+                <div class="attr-title">Lagoa do Santiago</div>
+                <div class="attr-desc">Głębokie, mniejsze jezioro wulkaniczne o uderzająco ciemnozielonej barwie, osłonięte ze wszystkich stron stromymi, mszystymi ścianami i dzikim lasem.</div>
+                <div class="map-frame-wrapper">
+                    <iframe src="https://maps.google.com/maps?q=37.8422,-25.7797&z=15&output=embed" allowfullscreen="" loading="lazy"></iframe>
+                </div>
+                <a class="btn-nav" href="https://www.google.com/maps/dir/?api=1&destination=37.8422,-25.7797" target="_blank">🧭 NAWIGUJ DO PUNKTU</a>
+            </div>
+
+            <div class="attraction-card">
+                <div class="attr-title">Miasteczko Sete Cidades</div>
+                <div class="attr-desc">Urokliwa i spokojna osada zlokalizowana bezpośrednio na samym dnie wygasłego krateru, tuż obok brzegów błękitnego jeziora Lagoa Azul.</div>
+                <div class="map-frame-wrapper">
+                    <iframe src="https://maps.google.com/maps?q=37.8630,-25.7980&z=15&output=embed" allowfullscreen="" loading="lazy"></iframe>
+                </div>
+                <a class="btn-nav" href="https://www.google.com/maps/dir/?api=1&destination=37.8630,-25.7980" target="_blank">🧭 NAWIGUJ DO PUNKTU</a>
+            </div>
+
+            <div class="attraction-card">
+                <div class="attr-title">Ponta da Ferraria</div>
+                <div class="attr-desc">Gorące baseny oceaniczne. Naturalne źródła geotermalne podgrzewają tu wodę morską bezpośrednio w skalnej zatoczce oceanu. Kąpiel wyłącznie podczas odpływu.</div>
+                <div class="map-frame-wrapper">
+                    <iframe src="https://maps.google.com/maps?q=37.8580,-25.8570&z=15&output=embed" allowfullscreen="" loading="lazy"></iframe>
+                </div>
+                <a class="btn-nav" href="https://www.google.com/maps/dir/?api=1&destination=37.8580,-25.8570" target="_blank">🧭 NAWIGUJ DO PUNKTU</a>
+            </div>
+        </div>
+
+        <!-- DZIEŃ 2 -->
+        <div id="dzien2">
+            <div class="day-header">
+                <span>DZIEŃ 2: Geotermalna Dolina Furnas</span>
+                <span class="range-badge">Można latać w zasięgu 500m</span>
+            </div>
+
+            <div class="attraction-card">
+                <div class="attr-title">Miradouro do Pico do Ferro</div>
+                <div class="attr-desc">Taras widokowy ulokowany na wysokiej krawędzi wulkanu, ukazujący całe jezioro Furnas oraz unoszące się z oddali dymy gejzerów.</div>
+                <div class="map-frame-wrapper">
+                    <iframe src="https://maps.google.com/maps?q=37.7719,-25.3312&z=15&output=embed" allowfullscreen="" loading="lazy"></iframe>
+                </div>
+                <a class="btn-nav" href="https://www.google.com/maps/dir/?api=1&destination=37.7719,-25.3312" target="_blank">🧭 NAWIGUJ DO PUNKTU</a>
+            </div>
+
+            <div class="attraction-card">
+                <div class="attr-title">Caldeiras das Furnas & Lagoa</div>
+                <div class="attr-desc">Geotermalny obszar pełen gorącego bulgoczącego błota i syczących szczelin. Nad jeziorem zakopuje się garnki z tradycyjnym obiedem Cozido.</div>
+                <div class="map-frame-wrapper">
+                    <iframe src="https://maps.google.com/maps?q=37.7730,-25.3040&z=15&output=embed" allowfullscreen="" loading="lazy"></iframe>
+                </div>
+                <a class="btn-nav" href="https://www.google.com/maps/dir/?api=1&destination=37.7730,-25.3040" target="_blank">🧭 NAWIGUJ DO PUNKTU</a>
+            </div>
+
+            <div class="attraction-card">
+                <div class="attr-title">Park Terra Nostra</div>
+                <div class="attr-desc">Historyczny park botaniczny. Jego sercem jest ogromny basen z naturalnie gorącą wodą termalną (38°C) o rdzawym kolorze przez wysoką zawartość żelaza.</div>
+                <div class="map-frame-wrapper">
+                    <iframe src="https://maps.google.com/maps?q=37.7720,-25.3130&z=15&output=embed" allowfullscreen="" loading="lazy"></iframe>
+                </div>
+                <a class="btn-nav" href="https://www.google.com/maps/dir/?api=1&destination=37.7720,-25.3130" target="_blank">🧭 NAWIGUJ DO PUNKTU</a>
+            </div>
+
+            <div class="attraction-card">
+                <div class="attr-title">Poça da Dona Beija</div>
+                <div class="attr-desc">Stylowy kompleks kamiennych basenów z gorącą wodą termalną otoczonych palmami, bambusami i tropikalnymi paprociami.</div>
+                <div class="map-frame-wrapper">
+                    <iframe src="https://maps.google.com/maps?q=37.7728,-25.3146&z=15&output=embed" allowfullscreen="" loading="lazy"></iframe>
+                </div>
+                <a class="btn-nav" href="https://www.google.com/maps/dir/?api=1&destination=37.7728,-25.3146" target="_blank">🧭 NAWIGUJ DO PUNKTU</a>
+            </div>
+        </div>
+
+        <!-- DZIEŃ 3 -->
+        <div id="dzien3">
+            <div class="day-header">
+                <span>DZIEŃ 3: Zielony Wschód & Klify Nordeste</span>
+                <span class="range-badge">Można latać w zasięgu 500m</span>
+            </div>
+
+            <div class="attraction-card">
+                <div class="attr-title">Park Ribeira dos Caldeirões</div>
+                <div class="attr-desc">Malownicza, głęboka dolina z gigantycznymi paprociami drzewiastymi, dawnymi kamiennymi młynami i głośnymi, wysokimi wodospadami.</div>
+                <div class="map-frame-wrapper">
+                    <iframe src="https://maps.google.com/maps?q=37.8420,-25.2670&z=15&output=embed" allowfullscreen="" loading="lazy"></iframe>
+                </div>
+                <a class="btn-nav" href="https://www.google.com/maps/dir/?api=1&destination=37.8420,-25.2670" target="_blank">🧭 NAWIGUJ DO PUNKTU</a>
+            </div>
+
+            <div class="attraction-card">
+                <div class="attr-title">Miradouro da Ponta do Sossego</div>
+                <div class="attr-desc">Najpiękniejszy punkt widokowy wschodu. Zaprojektowany jako wielopoziomowy ogród pełen kwiatów, wiszący na krawędzi klifu nad oceanem.</div>
+                <div class="map-frame-wrapper">
+                    <iframe src="https://maps.google.com/maps?q=37.7951,-25.1472&z=15&output=embed" allowfullscreen="" loading="lazy"></iframe>
+                </div>
+                <a class="btn-nav" href="https://www.google.com/maps/dir/?api=1&destination=37.7951,-25.1472" target="_blank">🧭 NAWIGUJ DO PUNKTU</a>
+            </div>
+
+            <div class="attraction-card">
+                <div class="attr-title">Miradouro do Tronqueira</div>
+                <div class="attr-desc">Dziki i rzadko odwiedzany punkt widokowy wysoko w górach, ukazujący pasma zalesione pierwotnym lasem endemicznym.</div>
+                <div class="map-frame-wrapper">
+                    <iframe src="https://maps.google.com/maps?q=37.7850,-25.1780&z=14&output=embed" allowfullscreen="" loading="lazy"></iframe>
+                </div>
+                <a class="btn-nav" href="https://www.google.com/maps/dir/?api=1&destination=37.7850,-25.1780" target="_blank">🧭 NAWIGUJ DO PUNKTU</a>
+            </div>
+
+            <div class="attraction-card">
+                <div class="attr-title">Farol do Arnel</div>
+                <div class="attr-desc">Pierwsza i najstarsza latarnia morska na Azorach, wbudowana w niezwykle strome, urwiste zbocze schodzące wprost do oceanu.</div>
+                <div class="map-frame-wrapper">
+                    <iframe src="https://maps.google.com/maps?q=37.8273,-25.1360&z=15&output=embed" allowfullscreen="" loading="lazy"></iframe>
+                </div>
+                <a class="btn-nav" href="https://www.google.com/maps/dir/?api=1&destination=37.8273,-25.1360" target="_blank">🧭 NAWIGUJ DO PUNKTU</a>
+            </div>
+        </div>
+
+        <!-- DZIEŃ 4 -->
+        <div id="dzien4">
+            <div class="day-header">
+                <span>DZIEŃ 4: Jezioro Ognia & Plantacje Herbaty</span>
+                <span class="range-badge">Można latać w zasięgu 300m</span>
+            </div>
+
+            <div class="attraction-card">
+                <div class="attr-title">Miradouro da Lagoa do Fogo</div>
+                <div class="attr-desc">Najbardziej nieskażone i najwyżej położone jezioro kraterowe, otoczone zielonymi grzbietami górskimi, często skąpane we mgle.</div>
+                <div class="map-frame-wrapper">
+                    <iframe src="https://maps.google.com/maps?q=37.7641,-25.4889&z=14&output=embed" allowfullscreen="" loading="lazy"></iframe>
+                </div>
+                <a class="btn-nav" href="https://www.google.com/maps/dir/?api=1&destination=37.7641,-25.4889" target="_blank">🧭 NAWIGUJ DO PUNKTU</a>
+            </div>
+
+            <div class="attraction-card">
+                <div class="attr-title">Caldeira Velha</div>
+                <div class="attr-desc">Egzotyczny rezerwat przyrody z ciepłymi basenami i naturalnym wodospadem termalnym, ukryty pośród olbrzymich paproci drzewiastych.</div>
+                <div class="map-frame-wrapper">
+                    <iframe src="https://maps.google.com/maps?q=37.7810,-25.5010&z=15&output=embed" allowfullscreen="" loading="lazy"></iframe>
+                </div>
+                <a class="btn-nav" href="https://www.google.com/maps/dir/?api=1&destination=37.7810,-25.5010" target="_blank">🧭 NAWIGUJ DO PUNKTU</a>
+            </div>
+
+            <div class="attraction-card">
+                <div class="attr-title">Salto do Cabrito</div>
+                <div class="attr-desc">Ukryty wodospad w leśnym wąwozie z metalowymi pomostami, na które można wejść, by podziwiać wodę z góry.</div>
+                <div class="map-frame-wrapper">
+                    <iframe src="https://maps.google.com/maps?q=37.7940,-25.4970&z=15&output=embed" allowfullscreen="" loading="lazy"></iframe>
+                </div>
+                <a class="btn-nav" href="https://www.google.com/maps/dir/?api=1&destination=37.7940,-25.4970" target="_blank">🧭 NAWIGUJ DO PUNKTU</a>
+            </div>
+
+            <div class="attraction-card">
+                <div class="attr-title">Plantacja Herbaty Gorreana</div>
+                <div class="attr-desc">Najstarsza działająca plantacja herbaty w Europie. Piękne, zielone labirynty krzewów rosnące falowo na zboczach schodzących do morza.</div>
+                <div class="map-frame-wrapper">
+                    <iframe src="https://maps.google.com/maps?q=37.8179,-25.4025&z=15&output=embed" allowfullscreen="" loading="lazy"></iframe>
+                </div>
+                <a class="btn-nav" href="https://www.google.com/maps/dir/?api=1&destination=37.8179,-25.4025" target="_blank">🧭 NAWIGUJ DO PUNKTU</a>
+            </div>
+        </div>
+
+        <!-- DZIEŃ 5 -->
+        <div id="dzien5">
+            <div class="day-header">
+                <span>DZIEŃ 5: Południowe Wybrzeże</span>
+                <span class="range-badge range-forbidden">Loty zabronione (Niezgłaszane / CTR)</span>
+            </div>
+
+            <div class="attraction-card">
+                <div class="attr-title">Vila Franca do Campo & Ilhéu</div>
+                <div class="attr-desc">Malownicza wysepka wulkaniczna oddalona o kilkaset metrów od brzegu, posiadająca idealnie kolistą lagunę wewnętrzną.</div>
+                <div class="map-frame-wrapper">
+                    <iframe src="https://maps.google.com/maps?q=37.7120,-25.4310&z=15&output=embed" allowfullscreen="" loading="lazy"></iframe>
+                </div>
+                <a class="btn-nav" href="https://www.google.com/maps/dir/?api=1&destination=37.7120,-25.4310" target="_blank">🧭 NAWIGUJ DO PUNKTU</a>
+            </div>
+
+            <div class="attraction-card">
+                <div class="attr-title">Ermida de Nossa Senhora da Paz</div>
+                <div class="attr-desc">Biała kapliczka na wzgórzu z zygzakowatymi schodami ozdobionymi kafelkami azulejos. Widok stąd obejmuje całe wybrzeże.</div>
+                <div class="map-frame-wrapper">
+                    <iframe src="https://maps.google.com/maps?q=37.7280,-25.4320&z=15&output=embed" allowfullscreen="" loading="lazy"></iframe>
+                </div>
+                <a class="btn-nav" href="https://www.google.com/maps/dir/?api=1&destination=37.7280,-25.4320" target="_blank">🧭 NAWIGUJ DO PUNKTU</a>
+            </div>
+        </div>
+
+        <!-- DZIEŃ 6 -->
+        <div id="dzien6">
+            <div class="day-header">
+                <span>DZIEŃ 6: Stolica & Jaskinie Lawowe</span>
+                <span class="range-badge range-forbidden">Loty zabronione (Niezgłaszane / CTR)</span>
+            </div>
+
+            <div class="attraction-card">
+                <div class="attr-title">Ponta Delgada (Centrum Miejskie)</div>
+                <div class="attr-desc">Historyczne serce wyspy. Bramy miejskie Portas da Cidade, szeroki deptak nadmorski, fort oraz targ Mercado da Graça.</div>
+                <div class="map-frame-wrapper">
+                    <iframe src="https://maps.google.com/maps?q=37.7410,-25.6680&z=15&output=embed" allowfullscreen="" loading="lazy"></iframe>
+                </div>
+                <a class="btn-nav" href="https://www.google.com/maps/dir/?api=1&destination=37.7410,-25.6680" target="_blank">🧭 NAWIGUJ DO PUNKTU</a>
+            </div>
+
+            <div class="attraction-card">
+                <div class="attr-title">Plantacja Ananasów A. Arruda</div>
+                <div class="attr-desc">Tradycyjne szklarnie, gdzie ananasy rosną w dymie organicznym, zyskując unikalny słodki aromat. Dojrzewanie trwa dwa lata.</div>
+                <div class="map-frame-wrapper">
+                    <iframe src="https://maps.google.com/maps?q=37.7490,-25.6510&z=15&output=embed" allowfullscreen="" loading="lazy"></iframe>
+                </div>
+                <a class="btn-nav" href="https://www.google.com/maps/dir/?api=1&destination=37.7490,-25.6510" target="_blank">🧭 NAWIGUJ DO PUNKTU</a>
+            </div>
+
+            <div class="attraction-card">
+                <div class="attr-title">Gruta do Carvão</div>
+                <div class="attr-desc">Imponujący tunel lawowy pod stolicą wyspy. Trasa turystyczna prowadzi wewnątrz całkowicie zastygłego podziemnego korytarza.</div>
+                <div class="map-frame-wrapper">
+                    <iframe src="https://maps.google.com/maps?q=37.7430,-25.6880&z=15&output=embed" allowfullscreen="" loading="lazy"></iframe>
+                </div>
+                <a class="btn-nav" href="https://www.google.com/maps/dir/?api=1&destination=37.7430,-25.6880" target="_blank">🧭 NAWIGUJ DO PUNKTU</a>
+            </div>
+        </div>
+
+        <!-- SŁOWNICZEK -->
+        <div class="panel" id="slownik">
+            <div class="panel-title" style="color: var(--accent-purple);">🗣️ Słowniczek Języka Portugalskiego z Wymową i Podziałem Płci</div>
+            <div class="vocab-grid">
+                <div class="vocab-card">
+                    <div class="pt">Bom dia</div>
+                    <div class="pronounce">[Bą dija]</div>
+                    <div class="pl">Dzień dobry (rano)</div>
+                    <div class="note">Stosowane od świtu do południa.</div>
+                </div>
+                <div class="vocab-card">
+                    <div class="pt">Boa tarde</div>
+                    <div class="pronounce">[Boa tardy]</div>
+                    <div class="pl">Dzień dobry (po południu)</div>
+                    <div class="note">Używane od godziny 12:00 do zmierzchu.</div>
+                </div>
+                <div class="vocab-card">
+                    <div class="pt">Obrigado</div>
+                    <div class="pronounce">[Obrygadu]</div>
+                    <div class="pl">Dziękuję (mówi chłopak)</div>
+                    <div class="note">Forma męska, używa jej Jacek.</div>
+                </div>
+                <div class="vocab-card">
+                    <div class="pt">Obrigada</div>
+                    <div class="pronounce">[Obrygada]</div>
+                    <div class="pl">Dziękuję (mówi dziewczyna)</div>
+                    <div class="note">Forma żeńska, używa jej Alicja.</div>
+                </div>
+                <div class="vocab-card">
+                    <div class="pt">Por favor</div>
+                    <div class="pronounce">[Por fawor]</div>
+                    <div class="pl">Proszę</div>
+                    <div class="note">Używane przy prośbach i zamówieniach.</div>
+                </div>
+                <div class="vocab-card">
+                    <div class="pt">De nada</div>
+                    <div class="pronounce">[Dy nada]</div>
+                    <div class="pl">Nie ma za co / Proszę bardzo</div>
+                    <div class="note">Klimatyczna odpowiedź na podziękowanie.</div>
+                </div>
+                <div class="vocab-card">
+                    <div class="pt">Adeus</div>
+                    <div class="pronounce">[Adeusz]</div>
+                    <div class="pl">Do widzenia</div>
+                    <div class="note">Tradycyjne formalne pożegnanie.</div>
+                </div>
+                <div class="vocab-card">
+                    <div class="pt">Até logo</div>
+                    <div class="pronounce">[Ate logu]</div>
+                    <div class="pl">Do zobaczenia wkrótce</div>
+                    <div class="note">Bardzo popularny zwrot pożegnalny.</div>
+                </div>
+                <div class="vocab-card">
+                    <div class="pt">Olá</div>
+                    <div class="pronounce">[Olla]</div>
+                    <div class="pl">Cześć</div>
+                    <div class="note">Uniwersalne luźne powitanie.</div>
+                </div>
+                <div class="vocab-card">
+                    <div class="pt">Conta, por favor</div>
+                    <div class="pronounce">[Kąta por fawor]</div>
+                    <div class="pl">Poproszę o rachunek</div>
+                    <div class="note">Do użycia w restauracjach.</div>
+                </div>
+                <div class="vocab-card">
+                    <div class="pt">Quanto custa?</div>
+                    <div class="pronounce">[Kuantu kuszta?]</div>
+                    <div class="pl">Ile to kosztuje?</div>
+                    <div class="note">Niezbędne pytanie przy zakupach pamiątek.</div>
+                </div>
+                <div class="vocab-card">
+                    <div class="pt">Desculpe</div>
+                    <div class="pronounce">[Dyskulpy]</div>
+                    <div class="pl">Przepraszam</div>
+                    <div class="note">Gdy chcesz kogoś zagadnąć lub ominąć w tłumie.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- LISTA KONTROLNA (NA SAMYM DOLE) -->
+        <div class="panel" id="checklist">
+            <div class="panel-title" style="color: var(--accent-green);">📋 Lista Kontrolna Przed Każdym Startem</div>
+            <div class="checklist-grid">
+                <div class="check-item">
+                    <input type="checkbox" id="chk-gimbal">
+                    <div class="check-item-text">
+                        <strong>Blokada mechaniczna gimbala</strong>
+                        <p>Zdejmij osłonę plastikową kamery przed uruchomieniem drona.</p>
+                    </div>
+                </div>
+                <div class="check-item">
+                    <input type="checkbox" id="chk-prop">
+                    <div class="check-item-text">
+                        <strong>Weryfikacja geometrii śmigieł</strong>
+                        <p>Upewnij się, że łopaty wirników nie posiadają rys ani zagięć.</p>
+                    </div>
+                </div>
+                <div class="check-item">
+                    <input type="checkbox" id="chk-card">
+                    <div class="check-item-text">
+                        <strong>Karta Nośnika MicroSD</strong>
+                        <p>Sprawdź poprawność osadzenia karty pamięci w slocie drona.</p>
+                    </div>
+                </div>
+                <div class="check-item">
+                    <input type="checkbox" id="chk-gps">
+                    <div class="check-item-text">
+                        <strong>Synchronizacja Satelitarna (GPS Lock)</strong>
+                        <p>Odczekaj na stabilne połączenie z minimum 12 satelitami przed startem.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PROFIL BEZPIECZEŃSTWA RTH -->
+        <div class="panel" id="rth">
+            <div class="panel-title" style="color: var(--accent-orange);">🔄 Awaryjny Profil Bezpieczeństwa RTH</div>
+            <div class="widget-box rth-alert">
+                <strong style="color: var(--accent-orange); font-size: 16px; display: block; margin-bottom: 5px;">⚠️ Krytyczna Konfiguracja Wysokości Powrotu:</strong>
+                <p>Podczas realizacji lotów wewnątrz potężnych kalder wulkanicznych (<strong>Sete Cidades</strong> oraz <strong>Lagoa do Fogo</strong>) ściany kraterów wznoszą się gwałtownie dookoła pozycji pilota. Przed startem manualnie skonfiguruj pułap RTH (Return To Home) w aplikacji DJI Fly na **wartość minimalną 75-90 metrów**. Zabezpieczy to platformę przed kolizją ze zboczem w razie utraty sygnału sterującego.</p>
+            </div>
+        </div>
+
+        <!-- PULPIT PILOTA -->
+        <div class="panel" id="pulpit">
+            <div class="panel-title">🛡️ Pulpit Pilota (Dane Autoryzacji e-AAN)</div>
+            <div class="grid-2">
+                <div>
+                    <div class="doc-item">
+                        <span>Główny Operator Drona</span>
+                        <strong>Alicja Maria Kosek (oraz rodzina do użytku prywatnego)</strong>
+                    </div>
+                    <div class="doc-item">
+                        <span>Model Platformy Bezzałogowej</span>
+                        <strong>DJI Mini SE Ultra-Light (&lt; 249g)</strong>
+                    </div>
+                </div>
+                <div>
+                    <div class="doc-item">
+                        <span>Fabryczny Numer Seryjny (SN)</span>
+                        <strong>4GMCK240031AYG</strong>
+                    </div>
+                    <div class="doc-item">
+                        <span>Identyfikator Polisy Ubezpieczeniowej OC</span>
+                        <strong>DRO028433</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- NOTATNIK I NARZĘDZIA -->
+        <div class="panel" id="dodatki-eksperta">
+            <div class="panel-title" style="color: var(--accent-blue);">📝 Interaktywny Notatnik Pokładowy</div>
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 10px;">Notatki zapisują się automatycznie w pamięci przeglądarki i nie znikną po odświeżeniu!</p>
+            <textarea class="notebook" id="note-area" placeholder="Wpisz tu godziny wylotów, numery parkingów, uwagi z trasy..."></textarea>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    // Globalna pusta zmienna dla klucza API Gemini (używana automatycznie przez środowisko)
+    const apiKey = "";
+
+    // Ładowanie notatek z localStorage
+    document.addEventListener('DOMContentLoaded', () => {
+        const savedNote = localStorage.getItem('sao_miguel_notes');
+        if (savedNote) {
+            document.getElementById('note-area').value = savedNote;
+        }
+
+        // Ładowanie stanu checklisty
+        const checklistItems = ['chk-gimbal', 'chk-prop', 'chk-card', 'chk-gps'];
+        checklistItems.forEach(id => {
+            const checkedState = localStorage.getItem(id);
+            if (checkedState === 'true') {
+                const el = document.getElementById(id);
+                if (el) el.checked = true;
+            }
+            const el = document.getElementById(id);
+            if (el) {
+                el.addEventListener('change', (e) => {
+                    localStorage.setItem(id, e.target.checked);
+                });
+            }
+        });
+    });
+
+    // Automatyczne zapisywanie notatnika
+    document.getElementById('note-area').addEventListener('input', (e) => {
+        localStorage.setItem('sao_miguel_notes', e.target.value);
+    });
+
+    // Logowanie i autoryzacja hasłem Azores2026
+    function verifyPassword() {
+        const input = document.getElementById('pass-input').value;
+        const errorMsg = document.getElementById('error-msg');
+        
+        // Base64 dla Azores2026: QXpvcmVzMjAyNg==
+        if (btoa(input) === 'QXpvcmVzMjAyNg==') {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('main-content').style.display = 'block';
+            window.dispatchEvent(new Event('resize')); // Wymuszenie odświeżenia map Google
+        } else {
+            errorMsg.style.display = 'block';
+            document.getElementById('pass-input').value = '';
+        }
+    }
+
+    // UNIWERSALNA FUNKCJA WYSYŁANIA ZAPYTANIA DO GEMINI API Z EXPONENTIAL BACKOFF
+    async function callGeminiAPI(prompt, systemInstruction = "") {
+        const model = "gemini-2.5-flash-preview-09-2025";
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+        
+        const payload = {
+            contents: [{
+                parts: [{ text: prompt }]
+            }]
+        };
+
+        if (systemInstruction) {
+            payload.systemInstruction = {
+                parts: [{ text: systemInstruction }]
+            };
+        }
+
+        // Wykładnicze wycofywanie (Exponential Backoff): retries, 1s, 2s, 4s, 8s, 16s
+        let delay = 1000;
+        for (let i = 0; i < 5; i++) {
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                    if (text) return text;
+                    throw new Error("Pusta odpowiedź z modelu.");
+                }
+                
+                // Jeśli błąd serwera lub limit zapytania, idziemy do retry
+                if (response.status === 429 || response.status >= 500) {
+                    throw new Error(`Błąd HTTP ${response.status}`);
+                } else {
+                    const errorDetail = await response.text();
+                    throw new Error(`Błąd krytyczny HTTP ${response.status}: ${errorDetail}`);
+                }
+            } catch (err) {
+                if (i === 4) {
+                    throw new Error("Wystąpił problem z połączeniem po 5 próbach. Spróbuj ponownie później.");
+                }
+                await new Promise(resolve => setTimeout(resolve, delay));
+                delay *= 2;
+            }
+        }
+    }
+
+    // FUNKCJA 4: OGÓLNY CZAT Z ASYSTENTEM (JACKOWE PYTANIA)
+    async function generateGeneralChat() {
+        const query = document.getElementById('chat-input').value.trim();
+        const btn = document.getElementById('btn-chat');
+        const spinner = document.getElementById('spinner-chat');
+        const responseBox = document.getElementById('response-chat');
+
+        if (!query) {
+            alert("Wpisz najpierw swoje pytanie o Azory lub konkretne miejsce!");
+            return;
+        }
+
+        btn.disabled = true;
+        spinner.style.display = 'inline-block';
+        responseBox.style.display = 'none';
+
+        const prompt = `Użytkownik pyta o Azory (São Miguel): "${query}". 
+Zanalizuj to pytanie i odpowiedz szczegółowo, czytelnie i przyjaźnie. Jeśli pyta o konkretne miejsce, określ jasno:
+1. Czy opłaca się tam jechać i dlaczego?
+2. Jakie są tam największe atrakcje przyrodnicze lub widoki?
+3. Praktyczna wskazówka (np. najlepsza pora na wizytę, na co uważać).
+Jeśli to ogólne pytanie o podróż, jedzenie lub kulturę, udziel wyczerpującej, miłej porady podróżniczej z przydatnymi trikami.`;
+        
+        const systemPrompt = "Jesteś genialnym, pomocnym i radosnym asystentem podróżnym wyspy São Miguel o imieniu Gemini. Zwracasz się do użytkownika przyjaźnie (użytkownik to Jacek, 11-letni chłopak z Polski, który podróżuje tam z mamą Alicją). Odpowiadasz z entuzjazmem, zwięźle, ale wyczerpująco, używając emoji, wyłącznie w języku polskim.";
+
+        try {
+            const answer = await callGeminiAPI(prompt, systemPrompt);
+            responseBox.innerText = answer;
+            responseBox.style.display = 'block';
+        } catch (error) {
+            responseBox.innerText = `⚠️ Błąd: ${error.message}`;
+            responseBox.style.display = 'block';
+        } finally {
+            btn.disabled = false;
+            spinner.style.display = 'none';
+        }
+    }
+
+    // FUNKCJA 1: GENEROWANIE PLANU AWARYJNEGO
+    async function generateWeatherAlternative() {
+        const location = document.getElementById('weather-location').value;
+        const btn = document.getElementById('btn-weather');
+        const spinner = document.getElementById('spinner-weather');
+        const responseBox = document.getElementById('response-weather');
+
+        btn.disabled = true;
+        spinner.style.display = 'inline-block';
+        responseBox.style.display = 'none';
+
+        const prompt = `Zaproponuj najlepszy, szczegółowy plan awaryjny na São Miguel dla lokacji: ${location}, ponieważ na miejscu panuje silny deszcz lub całkowita mgła i nie da się latać dronem ani podziwiać widoków. Co zamiast tego warto zwiedzić w pobliżu? Podaj maksymalnie 3 lokalne, fascynujące przyrodniczo lub kulturowo opcje bez widoków z góry (np. gorące źródła, jaskinie, muzea, urocze miasteczka, restauracje z lokalnym cozido). Dodaj krótką wskazówkę fotograficzną o tym, jak robić niesamowite, klimatyczne zdjęcia w deszczową pogodę.`;
+        const systemPrompt = "Jesteś lokalnym, eksperckim przewodnikiem po Azorach, specjalizującym się w wyspie São Miguel. Odpowiadasz z entuzjazmem, profesjonalnie, zwięźle i wyłącznie w języku polskim. Używasz emoji.";
+
+        try {
+            const answer = await callGeminiAPI(prompt, systemPrompt);
+            responseBox.innerText = answer;
+            responseBox.style.display = 'block';
+        } catch (error) {
+            responseBox.innerText = `⚠️ Błąd: ${error.message}`;
+            responseBox.style.display = 'block';
+        } finally {
+            btn.disabled = false;
+            spinner.style.display = 'none';
+        }
+    }
+
+    // FUNKCJA 2: PROJEKTOWANIE LOTU DRONEM
+    async function generateDroneShots() {
+        const location = document.getElementById('drone-location').value;
+        const btn = document.getElementById('btn-drone');
+        const spinner = document.getElementById('spinner-drone');
+        const responseBox = document.getElementById('response-drone');
+
+        btn.disabled = true;
+        spinner.style.display = 'inline-block';
+        responseBox.style.display = 'none';
+
+        const prompt = `Zaprojektuj kreatywny plan lotu dronem DJI Mini SE (który waży mniej niż 249g) dla lokalizacji: ${location}. Podaj dwie precyzyjne propozycje filmowych manewrów (np. powolne wznoszenie z ujawnieniem horyzontu, okrążanie punktu, niski lot nad wodą). Weź pod uwagę specyfikę terenu, wysokość i wiatr na Azorach. Opisz parametry lotu (np. sugerowana bezpieczna wysokość, kierunek lotu, czas trwania) oraz jak ustawić klatkaż/ekpozycję dla uzyskania kinowego efektu.`;
+        const systemPrompt = "Jesteś profesjonalnym operatorem drona i fotografem lotniczym, który doskonale zna przepisy i uwarunkowania geograficzne wyspy São Miguel. Twoje wskazówki są konkretne, bezpieczne dla małych dronów i inspirujące. Odpowiadasz wyłącznie w języku polskim.";
+
+        try {
+            const answer = await callGeminiAPI(prompt, systemPrompt);
+            responseBox.innerText = answer;
+            responseBox.style.display = 'block';
+        } catch (error) {
+            responseBox.innerText = `⚠️ Błąd: ${error.message}`;
+            responseBox.style.display = 'block';
+        } finally {
+            btn.disabled = false;
+            spinner.style.display = 'none';
+        }
+    }
+
+    // FUNKCJA 3: GENEROWANIE TŁUMACZENIA I ETYKIETY
+    async function generateTranslation() {
+        const text = document.getElementById('translate-input').value.trim();
+        const btn = document.getElementById('btn-translate');
+        const spinner = document.getElementById('spinner-translate');
+        const responseBox = document.getElementById('response-translate');
+
+        if (!text) {
+            alert("Wpisz najpierw tekst, który chcesz przetłumaczyć!");
+            return;
+        }
+
+        btn.disabled = true;
+        spinner.style.display = 'inline-block';
+        responseBox.style.display = 'none';
+
+        const prompt = `Przetłumacz następującą polską intencję na język portugalski: "${text}". 
+Format wyjściowy:
+1. Oficjalne i naturalne tłumaczenie po portugalsku (pogrubione).
+2. Fonetyczny zapis uproszczonej wymowy w nawiasie kwadratowym (tak, aby Polak mógł to łatwo przeczytać).
+3. Podział na formę męską i żeńską, jeśli czasownik lub zwrot tego wymaga.
+4. Krótka wskazówka dotycząca lokalnej kultury i etykiety na Azorach związana z tą sytuacją (np. jak grzecznie poprosić kelnera, jak podziękować, czy dawać napiwek).`;
+        const systemPrompt = "Jesteś ekspertem językowym, tłumaczem oraz znawcą portugalskiej i azorskiej kultury. Odpowiadasz profesjonalnie, przejrzyście i wyłącznie w języku polskim.";
+
+        try {
+            const answer = await callGeminiAPI(prompt, systemPrompt);
+            responseBox.innerText = answer;
+            responseBox.style.display = 'block';
+        } catch (error) {
+            responseBox.innerText = `⚠️ Błąd: ${error.message}`;
+            responseBox.style.display = 'block';
+        } finally {
+            btn.disabled = false;
+            spinner.style.display = 'none';
+        }
+    }
+</script>
+
+</body>
+</html>
